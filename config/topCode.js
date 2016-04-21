@@ -87,7 +87,7 @@ window.addEventListener('load', function () {
     console.log('bavIndex ( 0-10 )', bavIndex());
 } );
 // returns the average per quartile
-function freeQuartiles() {
+function freeQuartiles( limit) {
     var //loadTime = performance.timing.loadEventStart-results[0].getTime(),
         sMax = Object.keys(jsChecks).pop(),
         loadTime = jsChecks[sMax][ jsChecks[sMax].length -1 ].elapsed,
@@ -96,6 +96,13 @@ function freeQuartiles() {
         qChecks = Math.round(loadTime/CHECK_FREQ/4),
         timestamp = new Date().getTime(),
         elapsed = timestamp  - window.results[0].getTime();
+    // limit overides the auto value
+    if ( limit ) {
+        sMax = limit-1;
+        loadTime = limit* 1000;
+        qChecks = loadTime /CHECK_FREQ/4;
+    }
+
 //    console.log ( loadTime , elapsed );
     while ( s <= sMax ) {
         // if no responses for second then will not be an array set
@@ -116,7 +123,7 @@ function freeQuartiles() {
         }
         s++;
     }
-    console.log( quartiles );
+//    console.log( quartiles );
     for ( var q in ( { first:1,second:2,third:3,fourth:4})) {
         quartiles[q] = Math.round(quartiles[q] * 100 / qChecks);
     }
@@ -154,13 +161,19 @@ function freeSecs() {
     return out;
 }
 // % free up until onload event
-function bavIndex() {
+function bavIndex( limit ) {
     var //loadTime = performance.timing.loadEventStart-results[0].getTime(),
         //qChecks = loadTime /CHECK_FREQ-1, // -1 for first one
         pings = 0, s= 0,  sMax = Object.keys(jsChecks).pop(),
         extra = Math.floor(  ( jsChecks[sMax][ jsChecks[sMax].length -1 ].elapsed ) % 1000  / CHECK_FREQ );
         // have to assume last second is complete so add 1 ?
         qChecks = (sMax)*1000 /CHECK_FREQ + extra;
+    // if you specify a limit then ignores the above
+    if ( limit ) {
+        sMax = limit-1;
+        qChecks = (limit)*1000 /CHECK_FREQ;
+        extra = 0;
+    }
     for ( s=0; s<= sMax; s++) {
         if ( jsChecks[s] ) {
             pings += jsChecks[s].length;
