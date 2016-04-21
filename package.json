@@ -1,0 +1,19 @@
+{
+  "name": "ncc-tagproxy",
+  "version": "0.0.1",
+  "description": "JSON Tag API",
+  "private": true,
+  "engines": {
+    "node": "4.2.2",
+    "npm": "2.14.7"
+  },
+  "scripts": {
+    "start": "node tagproxy.js"
+  },
+  "dependencies": {
+    "config": "https://github.com/levexis/node-config/tarball/master",
+    "http-mitm-proxy": "^0.4.0",
+    "node-cache": "^3.2.1",
+    "q": "^1.4.1"
+  }
+}

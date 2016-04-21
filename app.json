@@ -1,0 +1,8 @@
+{
+    "name": "Tag Proxy",
+    "description": "MITM proxy for client side tests",
+    "repository": "https://github.com/ncc-tools/tagproxy",
+    "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_4pQc0dd05cujkeRGdRMWfEnUUn0a37PDfwPCmxyv-akHZ0txbZ9duw",
+    "keywords": ["node"],
+    "image": "heroku/nodejs"
+}

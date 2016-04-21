@@ -1,0 +1,10 @@
+machine:
+  node:
+    version: v4.2.2
+  environment:
+    NODE_ENV: test
+deployment:
+    master:
+        branch: master
+        heroku:
+          appname: tagproxy
