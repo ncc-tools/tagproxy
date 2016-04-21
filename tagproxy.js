@@ -15,7 +15,10 @@ proxy.onError(function(ctx, err, errorKind) {
 proxy.use(Proxy.gunzip);
 
 proxy.onRequest(function(ctx, callback) {
-    if (  true || ctx.clientToProxyRequest.headers.host.indexOf ('bbc') > -1 ) {
+    if (  (CONFIG.blockList||'').indexOf ( ctx.clientToProxyRequest.headers.host ) > -1 ) {
+        console.log( 'BLOCK: http://' + ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url );
+        ctx.proxyToClientResponse.end('');
+    } else {
         var chunks = [], cached = cache.get ( ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url);
         console.log( 'REQUEST: http://' + ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url );
         if ( cached ) {
@@ -41,19 +44,21 @@ proxy.onRequest(function(ctx, callback) {
             } );
             ctx.onResponseEnd( function ( ctx, callback ) {
                 var body = Buffer.concat( chunks );
-                //      ctx.proxyToClientResponse.headers['jesus'] = 'lives';
-                //  ctx.proxyToClientResponse.write("MITM");
-                //      ctx.proxyToClientResponse.write( Object.keys( ctx.proxyToClientResponse ).join (' ') ) ;
-                //      ctx.proxyToClientResponse._header += '\nx-jesus: alive\n';
-                //      ctx.proxyToClientResponse._header += '\ncache-control: alive\n';
-                //          ctx.proxyToClientResponse._header += '';
-
-                // headers end with \n\n so need to put headers inside that
-                //            ctx.proxyToClientResponse._header = ctx.proxyToClientResponse._header.replace('nginx','jesus');
-                //            console.log( ctx.proxyToClientResponse._header );
-                //            ctx.proxyToClientResponse.end( ctx.proxyToClientResponse._header );
+                // add a header to show tagProxy is running
+//                ctx.proxyToClientResponse._header.replace('\n\n', 'x-tagproxy: ' + new Date() + '\n\n' + ctx.proxyToClientResponse._header);
                 // don't cache not modified as we need a clear cache
                 if ( ctx.serverToProxyResponse.statusCode >= 200 && ctx.serverToProxyResponse.statusCode < 304 ) {
+                    // modify the response to inject my code into the head
+                    if(ctx.serverToProxyResponse.headers['content-type'] && ctx.serverToProxyResponse.headers['content-type'].indexOf('text/html') === 0) {
+                        if ( (CONFIG.injectList || '') .indexOf( ctx.clientToProxyRequest.headers.host ) > -1 ) {
+                            if ( CONFIG.topCode ) {
+                                body = body.toString().replace( '<head>', '<head>' + CONFIG.topCode );
+                            }
+                            if ( CONFIG.bottomCode ) {
+                                body = body.toString().replace( '</body>', CONFIG.bottomCode + '</body>' );
+                            }
+                        }
+                    }
                     console.log( 'cache set', ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url, body.length, cache.set( ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url,
                         { header : ctx.proxyToClientResponse._header,
                             body : body } ) );
@@ -66,11 +71,12 @@ proxy.onRequest(function(ctx, callback) {
             // make proxy request
             callback();
         }
-    } else {
+    }/*
+    else {
         console.log ( 'passthrough', ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url);
         // make proxy request
         callback();
-    }
+    }*/
 });
 
 
