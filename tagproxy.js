@@ -26,11 +26,11 @@ proxy.onRequest(function(ctx, callback) {
             // might need to reset the cache here so it doesn't randomly timeout
             // no callback as we don't want to make a request out
             console.log ( 'cache hit' , cached.body.length);
-            // add a 1s delay to all cached responses
+            // add a delay to all cached responses
             setTimeout( function () {
                     ctx.proxyToClientResponse.end( cached.body );
                 }
-                , 5000);
+                , 1);// disabled by setting to 1, this is in ms
         } else {
             //  ctx.proxyToClientResponse.end("Blocked");
             // no callback() so proxy request is not sent to the server
