@@ -50,7 +50,7 @@ proxy.onRequest(function(ctx, callback) {
                 if ( ctx.serverToProxyResponse.statusCode >= 200 && ctx.serverToProxyResponse.statusCode < 304 ) {
                     // modify the response to inject my code into the head
                     if(ctx.serverToProxyResponse.headers['content-type'] && ctx.serverToProxyResponse.headers['content-type'].indexOf('text/html') === 0) {
-                        if ( (CONFIG.injectList || '') .indexOf( ctx.clientToProxyRequest.headers.host ) > -1 ) {
+                        if ( !CONFIG.injectList || CONFIG.injectList.indexOf( ctx.clientToProxyRequest.headers.host ) > -1 ) {
                             if ( CONFIG.topCode ) {
                                 body = body.toString().replace( '<head>', '<head>' + CONFIG.topCode );
                             }
