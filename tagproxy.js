@@ -28,12 +28,12 @@ proxy.onRequest(function(ctx, callback) {
             ctx.proxyToClientResponse._header = cached.header.replace('transfer-encoding: chunked', 'content-length: ' + cached.body.length);
             // might need to reset the cache here so it doesn't randomly timeout
             // no callback as we don't want to make a request out
-            console.log ( 'cache hit' , cached.body.length);
+            console.log ( 'cache hit' , cached.body.length + 'B' , 1000* Math.round( cached.body.length * 8 / CONFIG.bps ));
             // add a delay to all cached responses
             setTimeout( function () {
                     ctx.proxyToClientResponse.end( cached.body );
                 }
-                , 1);// disabled by setting to 1, this is in ms
+                , cached.body.length * 8000 / CONFIG.bps );
         } else {
             //  ctx.proxyToClientResponse.end("Blocked");
             // no callback() so proxy request is not sent to the server

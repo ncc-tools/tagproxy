@@ -23,6 +23,7 @@ var config = {
     port: process.env.PORT || 8081,
     cacheLimit: 1024 * 1024 * 100, // 100MB cache limit, will flush entire cache if limit hit
     cacheTimeout: 60*60, // cache refreshes hourly
+    bps: 2000000, //2Mbps
     log: {
         fatal : console.trace,
         error : console.trace,
