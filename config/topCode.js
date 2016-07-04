@@ -1,5 +1,5 @@
 /**
- * Created by paulcook on 21/04/16.
+ * Created by paulcook on 21/04/16, code to do visual metrics
  */
 // capture load start time
 window.results=[ new Date() ];
@@ -8,6 +8,16 @@ window.disableTimestrap = true;
 window.perfKeys = [ 'navigationStart','unloadEventStart','unloadEventEnd','redirectStart','redirectEnd','fetchStart','domainLookupStart','domainLookupEnd','connectStart','connectEnd','secureConnectionStart','requestStart','responseStart','responseEnd','domLoading','domInteractive','domContentLoadedEventStart','domContentLoadedEventEnd','domComplete','loadEventStart','loadEventEnd' ]
 window.stylesheets = 0;
 
+window.BOOT_JANK=4000;
+window.JANK_INTERVAL=50;
+
+// add a delay into page
+function jank( ms ) {
+    var endTime =  new Date().getTime() + ms;
+    while ( new Date().getTime() < endTime );
+    // console.log( 'executed for', ms, new Date());
+}
+
 function forEach ( arr, fn ) {
     if ( arr.length ) {
         for ( var i = 0, len = arr.length; i < len; i++ ) {
@@ -15,7 +25,6 @@ function forEach ( arr, fn ) {
         }
     }
 }
-
 
 function checkPerformanceAPI (eventName) {
     return function () {
@@ -86,6 +95,18 @@ window.addEventListener('load', function () {
     console.log('% available by quartile' , freeQuartiles() );
     console.log('bavIndex ( 0-10 )', bavIndex());
 } );
+// just start with a straight delay
+if ( window.BOOT_JANK) {
+    jank(window.BOOT_JANK);
+}
+if ( window.JANK_INTERVAL) {
+    var intervalId = setInterval( function () {
+        jank(window.JANK_INTERVAL);
+    },window.JANK_INTERVAL * 2);
+    window.addEventListener('load', function () {
+        window.clearInterval(intervalId);
+    });
+}
 // returns the average per quartile
 function freeQuartiles( limit) {
     var //loadTime = performance.timing.loadEventStart-results[0].getTime(),
