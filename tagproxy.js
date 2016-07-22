@@ -16,11 +16,11 @@ proxy.use(Proxy.gunzip);
 
 proxy.onRequest(function(ctx, callback) {
     if (  (CONFIG.blockList||'').indexOf ( ctx.clientToProxyRequest.headers.host ) > -1 ) {
-        console.log( 'BLOCK: http://' + ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url );
+        CONFIG.log.debug( 'BLOCK: http://' + ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url );
         ctx.proxyToClientResponse.end('');
     } else {
         var chunks = [], cached = cache.get ( ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url);
-        console.log( 'REQUEST: http://' + ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url );
+        CONFIG.log.debug( 'REQUEST: http://' + ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url );
         if ( cached ) {
             // not chunked
             // todo: put a header to indicate its mitm cached
@@ -28,7 +28,7 @@ proxy.onRequest(function(ctx, callback) {
             ctx.proxyToClientResponse._header = cached.header.replace('transfer-encoding: chunked', 'content-length: ' + cached.body.length);
             // might need to reset the cache here so it doesn't randomly timeout
             // no callback as we don't want to make a request out
-            console.log ( 'cache hit' , cached.body.length + 'B' , 1000* Math.round( cached.body.length * 8 / CONFIG.bps ));
+            CONFIG.log.debug ( 'cache hit' , cached.body.length + 'B' , 1000* Math.round( cached.body.length * 8 / CONFIG.bps ));
             // add a delay to all cached responses
             setTimeout( function () {
                     ctx.proxyToClientResponse.end( cached.body );
@@ -52,14 +52,19 @@ proxy.onRequest(function(ctx, callback) {
                     if(ctx.serverToProxyResponse.headers['content-type'] && ctx.serverToProxyResponse.headers['content-type'].indexOf('text/html') === 0) {
                         if ( !CONFIG.injectList || CONFIG.injectList.indexOf( ctx.clientToProxyRequest.headers.host ) > -1 ) {
                             if ( CONFIG.topCode ) {
-                                body = body.toString().replace( '<head>', '<head>' + CONFIG.topCode );
+                                if ( ctx.clientToProxyRequest.headers.host === 'www.butlins.com' ) {
+                                    body = body.toString().replace('<head id="Head1">', '<head id="Head1">' + CONFIG.topCode);
+                                } else {
+                                    body = body.toString().replace('<head>', '<head>' + CONFIG.topCode);
+                                    // just for butlins
+                                }
                             }
                             if ( CONFIG.bottomCode ) {
                                 body = body.toString().replace( '</body>', CONFIG.bottomCode + '</body>' );
                             }
                         }
                     }
-                    console.log( 'cache set', ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url, body.length, cache.set( ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url,
+                    CONFIG.log.debug( 'cache set', ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url, body.length, cache.set( ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url,
                         { header : ctx.proxyToClientResponse._header,
                             body : body } ) );
                     //       ctx.proxyToClientResponse.write("MITM");
@@ -73,7 +78,7 @@ proxy.onRequest(function(ctx, callback) {
         }
     }/*
     else {
-        console.log ( 'passthrough', ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url);
+        CONFIG.log.debug ( 'passthrough', ctx.clientToProxyRequest.headers.host + ctx.clientToProxyRequest.url);
         // make proxy request
         callback();
     }*/
@@ -82,4 +87,4 @@ proxy.onRequest(function(ctx, callback) {
 
 
 proxy.listen({ port: CONFIG.port });
-console.log('listening on ' + CONFIG.port);
+CONFIG.log.debug('proxy started on ' + CONFIG.port);

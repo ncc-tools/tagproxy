@@ -23,7 +23,7 @@ var config = {
     port: process.env.PROXY_PORT || 8081,
     cacheLimit: 0, // no caching
     cacheTimeout: 0, // no caching
-    bps: 0, //no throttling
+    bps: 2000000, //no throttling
 //    cacheLimit: 1024 * 1024 * 100, // 100MB cache limit, will flush entire cache if limit hit
 //    cacheTimeout: 60*60, // cache refreshes hourly
 //    bps: 2000000, //2Mbps
@@ -36,15 +36,13 @@ var config = {
         warning: console.log
     },
     // inserted after open head tag, no head tag no insertion
-    topCode: '<script>'+ fs.readFileSync('./config/topCode.js' ).toString() + '</script>',
+    topCode: '<script>'+ fs.readFileSync('./config/hackTop.js' ).toString() + '</script>',
     // inserted before close body tag, no colos
-    bottomCode: '<script>'+ fs.readFileSync('./config/bottomCode.js' ).toString() + '</script>',
+    bottomCode: '',
 
-//    blockList: "www.googleadservices.com static.criteo.net www.dwin1.com www.sc.pages04.net 3466190.fls.doubleclick.net lakeland.122.2o7.net www.google-analytics.com bat.bing.com cdn-eu.brcdn.com googleads.g.doubleclick.net widget.criteo.com c1.rfihub.net lakeland-www.baynote.net www.google.com www.google.co.uk bat.r.msn.com 20569815p.rfihub.com rs.gwallet.com p-eu.brsrvr.com cm.g.doubleclick.net 20675065p.rfihub.com 20675099p.rfihub.com p.rfihub.com image2.pubmatic.com pixel.rubiconproject.com ib.adnxs.com dpm.demdex.net a.rfihub.com t4.liverail.com ckm-m.xp1.ru4.com scontent.lrcdn.net ps.eyeota.net adadvisor.net idsync.rlcdn.com sync.search.spotxchange.com e.nexac.com tapestry.tapad.com us-u.openx.net d.agkn.com d.xp1.ru4.com x.bidswitch.net ads.yahoo.com rtd.tubemogul.com aka.spotxcdn.com soma.smaato.net geo-um.btrll.com dsum.casalemedia.com ads.kiosked.com loadus.exelator.com cs.gssprt.jp m.xp1.ru4.com dis.eu.criteo.com www.pages04.net rtb-csync.smartadserver.com ad.360yield.com sync.1rx.io ap.lijit.com match.sharethrough.com eb2.3lift.com www.facebook.com bh.contextweb.com dis.criteo.com trc.taboola.com ums.adtech.de",
     blockList: '',
-// need to explicitly set domains to prevent code being executed multiple times, eg if iframes are being used etc
 //    injectList: "www.theguardian.com www.eventbrite.co.uk www.coxandcox.co.uk www.johnlewis.com pc-research.herokuapp.com www.lakeland.co.uk www.bbc.co.uk www.dailymail.co.uk east.surreytriratna.org www.bbc.com www.nccgroup.trust"
-    injectList: '',
+    injectList: "www.dailymail.co.uk www.butlins.com",
     api: {
         port: process.env.API_PORT || 8000,
         name: 'NCC Tag DB',

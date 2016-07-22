@@ -19,7 +19,7 @@ fs.readFile('./config/bottomCode.js', 'utf8', function (err,data) {
 });
 
 var config = {
-    name: 'default',
+    name: 'test',
     port: process.env.PROXY_PORT || 8081,
     cacheLimit: 0, // no caching
     cacheTimeout: 0, // no caching
@@ -48,7 +48,7 @@ var config = {
     api: {
         port: process.env.API_PORT || 8000,
         name: 'NCC Tag DB',
-        versionPrefix: '1',
+        versionPrefix: '2',
         versionNumber: require('../package.json').version    }
 };
 // export
